@@ -245,15 +245,9 @@ static void uart_event_task(void *pvParameters)
     vTaskDelete(NULL);
 }
 
-
-void app_main()
+void uart_init()
 {
-    esp_log_level_set(TAG, ESP_LOG_INFO);
-
-    i2c_master_init();
-    drv8830_flt_reset();
-
-    /* Configure parameters of an UART driver,
+   /* Configure parameters of an UART driver,
      * communication pins and install the driver */
     uart_config_t uart_config = {
         .baud_rate = 115200,
@@ -275,7 +269,15 @@ void app_main()
     uart_enable_pattern_det_intr(EX_UART_NUM, '+', PATTERN_CHR_NUM, 10000, 10, 10);
     //Reset the pattern queue length to record at most 20 pattern positions.
     uart_pattern_queue_reset(EX_UART_NUM, 20);
+}
 
+void app_main()
+{
+    esp_log_level_set(TAG, ESP_LOG_INFO);
+
+    i2c_master_init();
+    drv8830_flt_reset();
+    uart_init()
     //Create a task to handler UART event from ISR
     xTaskCreate(uart_event_task, "uart_event_task", 2048, NULL, 12, NULL);
 }
